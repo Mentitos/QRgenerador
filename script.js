@@ -105,62 +105,66 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- PDF Download Logic ---
-    downloadPdfBtn.addEventListener('click', async () => {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF('p', 'mm', 'a4');
-        const qrDataUrl = await qrCode.getRawData('png');
-        if (!qrDataUrl) return;
+    // --- PDF Generation Logic ---
+    async function generatePdf(type) {
+        try {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'a4');
+            const qrDataUrl = await qrCode.getRawData('png');
 
-        const pageW = doc.internal.pageSize.getWidth();
-        const pageH = doc.internal.pageSize.getHeight();
-        const margin = 10;
-        const cols = 4;
-        const rows = 4;
-        const cellW = (pageW - 2 * margin) / cols;
-        const cellH = (pageH - 2 * margin) / rows;
-        const qrSize = Math.min(cellW, cellH) * 0.7;
-        const topText = topTextInput.value;
-        const bottomText = bottomTextInput.value;
-
-        for (let i = 0; i < rows; i++) {
-            for (let j = 0; j < cols; j++) {
-                const x = margin + j * cellW;
-                const y = margin + i * cellH;
-                const centerX = x + cellW / 2;
-                const centerY = y + cellH / 2;
-
-                doc.setDrawColor(200);
-                doc.rect(x, y, cellW, cellH);
-                doc.setFontSize(8);
-                doc.text(topText, centerX, centerY - qrSize / 2 - 2, { align: 'center' });
-                doc.addImage(qrDataUrl, 'PNG', centerX - qrSize / 2, centerY - qrSize / 2, qrSize, qrSize);
-                doc.text(bottomText, centerX, centerY + qrSize / 2 + 4, { align: 'center' });
+            if (!qrDataUrl) {
+                alert('No se pudo generar la imagen del QR.');
+                return;
             }
+
+            const topText = topTextInput.value;
+            const bottomText = bottomTextInput.value;
+            const pageW = doc.internal.pageSize.getWidth();
+            const pageH = doc.internal.pageSize.getHeight();
+
+            if (type === 'grid') {
+                const margin = 10;
+                const cols = 4;
+                const rows = 4;
+                const cellW = (pageW - 2 * margin) / cols;
+                const cellH = (pageH - 2 * margin) / rows;
+                const qrSize = Math.min(cellW, cellH) * 0.7;
+
+                for (let i = 0; i < rows; i++) {
+                    for (let j = 0; j < cols; j++) {
+                        const x = margin + j * cellW;
+                        const y = margin + i * cellH;
+                        const centerX = x + cellW / 2;
+                        const centerY = y + cellH / 2;
+
+                        doc.setDrawColor(200);
+                        doc.rect(x, y, cellW, cellH);
+                        doc.setFontSize(8);
+                        doc.text(topText, centerX, centerY - qrSize / 2 - 2, { align: 'center' });
+                        doc.addImage(qrDataUrl, 'PNG', centerX - qrSize / 2, centerY - qrSize / 2, qrSize, qrSize);
+                        doc.text(bottomText, centerX, centerY + qrSize / 2 + 4, { align: 'center' });
+                    }
+                }
+            } else if (type === 'large') {
+                const margin = 20;
+                const qrSize = Math.min(pageW, pageH) - 2 * margin;
+                const x = (pageW - qrSize) / 2;
+                const y = (pageH - qrSize) / 2;
+
+                doc.setFontSize(12);
+                doc.text(topText, pageW / 2, y - 5, { align: 'center' });
+                doc.addImage(qrDataUrl, 'PNG', x, y, qrSize, qrSize);
+                doc.text(bottomText, pageW / 2, y + qrSize + 10, { align: 'center' });
+            }
+
+            doc.output('dataurlnewwindow');
+
+        } catch (error) {
+            console.error("Error al generar el PDF:", error);
+            alert("No se pudo generar el PDF. Asegúrate de tener conexión a internet para cargar las librerías y revisa la consola del navegador (F12) para más detalles.");
         }
-        doc.save('qrcodes_4x4.pdf');
-    });
+    }
 
-    downloadPdfLargeBtn.addEventListener('click', async () => {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF('p', 'mm', 'a4');
-        const qrDataUrl = await qrCode.getRawData('png');
-        if (!qrDataUrl) return;
-
-        const pageW = doc.internal.pageSize.getWidth();
-        const pageH = doc.internal.pageSize.getHeight();
-        const margin = 20;
-        const qrSize = Math.min(pageW, pageH) - 2 * margin;
-        const x = (pageW - qrSize) / 2;
-        const y = (pageH - qrSize) / 2;
-        const topText = topTextInput.value;
-        const bottomText = bottomTextInput.value;
-
-        doc.setFontSize(12);
-        doc.text(topText, pageW / 2, y - 5, { align: 'center' });
-        doc.addImage(qrDataUrl, 'PNG', x, y, qrSize, qrSize);
-        doc.text(bottomText, pageW / 2, y + qrSize + 10, { align: 'center' });
-
-        doc.save('qrcode_grande.pdf');
-    });
+    downloadPdfBtn.addEventListener('click', () => generatePdf('grid'));
+    downloadPdfLargeBtn.addEventListener('click', () => generatePdf('large'));
 });
