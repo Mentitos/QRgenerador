@@ -142,7 +142,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                             doc.setDrawColor(200);
                             doc.rect(x, y, cellW, cellH);
-                            doc.setFontSize(8);
+                            doc.setFont('helvetica', 'bold');
+                            doc.setFontSize(10);
                             doc.text(topText, centerX, centerY - qrSize / 2 - 2, { align: 'center' });
                             doc.addImage(qrDataUrl, 'PNG', centerX - qrSize / 2, centerY - qrSize / 2, qrSize, qrSize);
                             doc.text(bottomText, centerX, centerY + qrSize / 2 + 4, { align: 'center' });
@@ -154,7 +155,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     const x = (pageW - qrSize) / 2;
                     const y = (pageH - qrSize) / 2;
 
-                    doc.setFontSize(12);
+                    doc.setFont('helvetica', 'bold');
+                    doc.setFontSize(16);
                     doc.text(topText, pageW / 2, y - 5, { align: 'center' });
                     doc.addImage(qrDataUrl, 'PNG', x, y, qrSize, qrSize);
                     doc.text(bottomText, pageW / 2, y + qrSize + 10, { align: 'center' });
