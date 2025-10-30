@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const bottomTextPreview = document.getElementById('bottom-text-preview');
     const canvas = document.getElementById('canvas');
 
-    const GITHUB_LOGO_URL = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjI1NiIgaGVpZ2h0PSIyNTYiPjxwYXRoIGZpbGw9ImJsYWNrIiBkPSJNMTIgLjI5N0M1LjMyNy4yOTcgMCA1LjYyNSAwIDEyLjI5N2MwIDUuMzAzIDMuNDM4IDkuOCA4LjIwNSAxMS4zODVjLjYuMTEzLjgyLS4yNTguODItLjU3N2MwLS4yODUtLjAxLTEuMDQtLjAxNS0yLjA0Yy0zLjMzOC43MjQtNC4wNDItMS42MS00LjA0Mi0xLjYxQzQuNDIyIDE4LjA3IDMuNjMzIDE3LjcgMy42MzMgMTcuN2MtMS4wODctLjc0NC4wODQtLjcyOS4wODQtLjcyOWMxLjIwNS4wODQgMS44MzggMS4yMzYgMS44MzggMS4yMzZjMS4wNyAxLjgzNSAyLjgwOSAxLjMwNSAzLjQ5NS45OThjLjEwOC0uNzc2LjQxNy0xLjMwNS43Ni0xLjYwNWMtMi42NjUtLjMtNS40NjYtMS4zMzItNS40NjYtNS45M2MwLTEuMzEuNDY1 hesitant-2.38IDEuMjM1LTMuMjJjLS4xMzUtLjMwMy0uNTQtMS41MjMuMTA1LTMuMTc2YzAgMCAxLjAwNS0uMzIyIDMuMyAxLjIzYy45Ni0uMjY3IDEuOTgtLjM5OSAzLS40MDVjMS4wMi4wMDYgMi4wNC4xMzggMyAuNDA1YzIuMjgtMS41NTIgMy4yODUtMS4yMyAzLjI4NS0xLjIzLjY0NSAxLjY1My4yNCAyLjg3My4xMiAzLjE3NmMuNzY1Ljg0IDEuMjMgMS45MSAxLjIzIDMuMjJjMCA0LjYxLTIuODUgNS42MjUtNS40NzUgNS45MmMuNDIuMzYuODEgMS4wOTYuODEgMi4yMmMwIDEuNjA2LS4wMTUgMi44OTYtLjAxNSAzLjI4NmMwIC4zMTUuMjEuNjkuODI1Ljc3QzIwLjU2NSAyMi4wOTIgMjQgMTcuNTkyIDI0IDEyLjI5N2MwLTYuNjI3LTUuMzczLTEyLTEyLTEyWiIvPjwvc3ZnPg==';
+    const GITHUB_LOGO_URL = 'https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg';
 
     let customLogo = null;
 
@@ -110,54 +110,59 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF('p', 'mm', 'a4');
-            const qrDataUrl = await qrCode.getRawData('png');
+            const qrBlob = await qrCode.getRawData('png');
 
-            if (!qrDataUrl) {
+            if (!qrBlob) {
                 alert('No se pudo generar la imagen del QR.');
                 return;
             }
 
-            const topText = topTextInput.value;
-            const bottomText = bottomTextInput.value;
-            const pageW = doc.internal.pageSize.getWidth();
-            const pageH = doc.internal.pageSize.getHeight();
+            const reader = new FileReader();
+            reader.onload = function () {
+                const qrDataUrl = this.result;
+                const topText = topTextInput.value;
+                const bottomText = bottomTextInput.value;
+                const pageW = doc.internal.pageSize.getWidth();
+                const pageH = doc.internal.pageSize.getHeight();
 
-            if (type === 'grid') {
-                const margin = 10;
-                const cols = 4;
-                const rows = 4;
-                const cellW = (pageW - 2 * margin) / cols;
-                const cellH = (pageH - 2 * margin) / rows;
-                const qrSize = Math.min(cellW, cellH) * 0.7;
+                if (type === 'grid') {
+                    const margin = 10;
+                    const cols = 2;
+                    const rows = 2;
+                    const cellW = (pageW - 2 * margin) / cols;
+                    const cellH = (pageH - 2 * margin) / rows;
+                    const qrSize = Math.min(cellW, cellH) * 0.7;
 
-                for (let i = 0; i < rows; i++) {
-                    for (let j = 0; j < cols; j++) {
-                        const x = margin + j * cellW;
-                        const y = margin + i * cellH;
-                        const centerX = x + cellW / 2;
-                        const centerY = y + cellH / 2;
+                    for (let i = 0; i < rows; i++) {
+                        for (let j = 0; j < cols; j++) {
+                            const x = margin + j * cellW;
+                            const y = margin + i * cellH;
+                            const centerX = x + cellW / 2;
+                            const centerY = y + cellH / 2;
 
-                        doc.setDrawColor(200);
-                        doc.rect(x, y, cellW, cellH);
-                        doc.setFontSize(8);
-                        doc.text(topText, centerX, centerY - qrSize / 2 - 2, { align: 'center' });
-                        doc.addImage(qrDataUrl, 'PNG', centerX - qrSize / 2, centerY - qrSize / 2, qrSize, qrSize);
-                        doc.text(bottomText, centerX, centerY + qrSize / 2 + 4, { align: 'center' });
+                            doc.setDrawColor(200);
+                            doc.rect(x, y, cellW, cellH);
+                            doc.setFontSize(8);
+                            doc.text(topText, centerX, centerY - qrSize / 2 - 2, { align: 'center' });
+                            doc.addImage(qrDataUrl, 'PNG', centerX - qrSize / 2, centerY - qrSize / 2, qrSize, qrSize);
+                            doc.text(bottomText, centerX, centerY + qrSize / 2 + 4, { align: 'center' });
+                        }
                     }
+                } else if (type === 'large') {
+                    const margin = 20;
+                    const qrSize = Math.min(pageW, pageH) - 2 * margin;
+                    const x = (pageW - qrSize) / 2;
+                    const y = (pageH - qrSize) / 2;
+
+                    doc.setFontSize(12);
+                    doc.text(topText, pageW / 2, y - 5, { align: 'center' });
+                    doc.addImage(qrDataUrl, 'PNG', x, y, qrSize, qrSize);
+                    doc.text(bottomText, pageW / 2, y + qrSize + 10, { align: 'center' });
                 }
-            } else if (type === 'large') {
-                const margin = 20;
-                const qrSize = Math.min(pageW, pageH) - 2 * margin;
-                const x = (pageW - qrSize) / 2;
-                const y = (pageH - qrSize) / 2;
 
-                doc.setFontSize(12);
-                doc.text(topText, pageW / 2, y - 5, { align: 'center' });
-                doc.addImage(qrDataUrl, 'PNG', x, y, qrSize, qrSize);
-                doc.text(bottomText, pageW / 2, y + qrSize + 10, { align: 'center' });
-            }
-
-            doc.output('dataurlnewwindow');
+                doc.output('dataurlnewwindow');
+            };
+            reader.readAsDataURL(qrBlob);
 
         } catch (error) {
             console.error("Error al generar el PDF:", error);
