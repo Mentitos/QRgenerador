@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de QR Personalizado</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Generador de QR Personalizado</h1>
+        <div class="main-content">
+            <div class="form-container">
+                <label for="url-input">URL o Texto:</label>
+                <input type="text" id="url-input" placeholder="https://ejemplo.com">
+
+                <label for="top-text-input">Texto Superior:</label>
+                <input type="text" id="top-text-input" placeholder="Escanea para visitar">
+
+                <label for="bottom-text-input">Texto Inferior:</label>
+                <input type="text" id="bottom-text-input" placeholder="Mi Sitio Web">
+
+                <label for="logo-input">Logo Personalizado (opcional):</label>
+                <input type="file" id="logo-input" accept="image/*">
+
+                <div class="checkbox-container">
+                    <input type="checkbox" id="github-logo-checkbox">
+                    <label for="github-logo-checkbox">Añadir logo de GitHub</label>
+                </div>
+
+                <label for="dots-style-select">Estilo de Puntos:</label>
+                <select id="dots-style-select">
+                    <option value="rounded">Redondeado</option>
+                    <option value="dots">Puntos</option>
+                    <option value="classy">Clásico</option>
+                    <option value="classy-rounded">Clásico Redondeado</option>
+                    <option value="square">Cuadrado</option>
+                    <option value="extra-rounded">Extra Redondeado</option>
+                </select>
+
+                <label for="corners-style-select">Estilo de Esquinas:</label>
+                <select id="corners-style-select">
+                    <option value="extra-rounded">Extra Redondeado</option>
+                    <option value="square">Cuadrado</option>
+                    <option value="dot">Punto</option>
+                </select>
+
+                <div class="button-group">
+                    <button id="download-pdf-btn">Descargar PDF (4x4)</button>
+                    <button id="download-pdf-large-btn">Descargar PDF (Grande)</button>
+                </div>
+            </div>
+            <div class="preview-wrapper">
+                <h2>Previsualización</h2>
+                <div id="preview-container">
+                    <p id="top-text-preview"></p>
+                    <div id="canvas"></div>
+                    <p id="bottom-text-preview"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
