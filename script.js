@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
     githubLogoCheckbox.checked = true;
     urlInput.value = 'https://github.com/gemini-cli';
     topTextInput.value = 'Visita mi perfil';
-    bottomTextInput.value = 'Proyecto Gemini';
+    bottomTextInput.value = 'Proyecto Angel';
     updatePreview();
 
     function updatePreview() {
